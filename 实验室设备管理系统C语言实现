@@ -1,0 +1,393 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define N 100
+#define M 50
+
+struct equipment {
+    int num;//编号
+    char kind[20];//种类
+    char name[20];//名称
+    int price;//价格
+    char buydate[20];//购入日期
+    int scrap;//是否报废,0代表报废，1代表没有报废
+    char scrapdate[20];//报废日期
+}equ[N];
+
+struct manager {
+    int num;//编号
+    char phone[20];//电话号码
+    char password[20];//密码
+}manager[M];
+
+//读取文件，并且将文件数据个数返回
+int readfile(FILE *fp) {
+    int i = 0;
+    if ((fp=fopen("/Users/john/Desktop/equipment.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    while (!feof(fp)) {
+        fscanf(fp, "%d %s %s %d %s %d %s",&equ[i].num,equ[i].kind,equ[i].name,&equ[i].price,equ[i].buydate,&equ[i].scrap,equ[i].scrapdate);
+        i++;
+    }
+    fclose(fp);
+    return i;
+}
+
+//将维护后的数据写入文件
+void writefile(FILE *fp,int n) {
+    if ((fp=fopen("/Users/john/Desktop/equipment.txt","w"))==NULL) {
+        printf("无法打开此文件!");
+    }
+    //将数据输出到文件中
+    for (int i=0;i<n;i++) {
+        fprintf(fp, "%d %s %s %d %s %d %s\n",equ[i].num,equ[i].kind,equ[i].name,equ[i].price,equ[i].buydate,equ[i].scrap,equ[i].scrapdate);
+    }
+    fclose(fp);
+}
+
+//实验设备信息添加模块
+void add() {
+    //声明调用的函数
+    void choosemenu(void);
+    void menu(void);
+    FILE *fp = nullptr;
+    int n,i,m;
+    n=readfile(fp);
+    printf("你要输入几个数据？");
+    scanf("%d",&m);
+    for(i=n-1;i<n+m-1;i++) {
+        printf("输入设备信息：编号，种类，名字，价格，购入日期，是否报废，报废日期：");
+        scanf("%d %s %s %d %s %d %s",&equ[i].num,equ[i].kind,equ[i].name,&equ[i].price,equ[i].buydate,&equ[i].scrap,equ[i].scrapdate);
+    }
+    writefile(fp,n);
+    choosemenu();
+}
+
+//实验设备删除模块
+void del() {
+    void choosemenu(void);
+    FILE *fp1 = nullptr;
+    int i=0,a,n;//n用来计数
+    int j =0;
+    printf("请输入你要删除设备的编号:");
+    scanf("%d",&a);
+    n=readfile(fp1);
+    for (i=0;i<n-1;i++) {
+        if(j==1) {
+            equ[i] = equ[i+1];
+        }
+        if (equ[i].num==a) {
+            j=1;
+            equ[i] = equ[i+1];
+        }
+    }
+    fclose(fp1);
+    if(j==1) {
+        printf("已经正确删除了该设备！\n");
+    }
+    else {
+        printf("不存在该设备！\n");
+    }
+    FILE *fp2 = nullptr;
+    writefile(fp2,n-1);
+    choosemenu();
+}
+
+//实验设备信息修改模块
+void modify() {
+    void choosemenu(void);//声明调用函数
+    FILE *fp;
+    int i=0,a,n;//n用来计数
+    printf("请输入你要修改设备的编号:\n");
+    scanf("%d",&a);
+    if ((fp=fopen("/Users/john/Desktop/equipment.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    while (!feof(fp)) {
+        fscanf(fp, "%d %s %s %d %s %d %s",&equ[i].num,equ[i].kind,equ[i].name,&equ[i].price,equ[i].buydate,&equ[i].scrap,equ[i].scrapdate);
+        //找出要修改的实验设备并进行修改
+        if (equ[i].num==a) {
+            printf("输入新设备编号:");
+            scanf("%d",&equ[i].num);
+            printf("输入新设备种类:");
+            scanf("%s",equ[i].kind);
+            printf("请输入新设备名称:");
+            scanf("%s",equ[i].name);
+            printf("请输入新设备价格:");
+            scanf("%d",&equ[i].price);
+            printf("请输入新设备购入日期:");
+            scanf("%s",equ[i].buydate);
+            printf("请输入新设备是否报废:");
+            scanf("%d",&equ[i].scrap);
+            printf("请输入新设备报废日期:");
+            scanf("%s",equ[i].scrapdate);
+        }
+        i++;
+    }
+    n=i;
+    fclose(fp);
+    writefile(fp,n);
+    choosemenu();
+}
+
+//实验设备分类统计模块
+void sta() {
+    void choosemenu(void);
+    FILE *fp = nullptr;
+    char kind[20];
+    int i;
+    int n=readfile(fp);
+    printf("请输入你想要统计的设备种类:");
+    scanf("%s",kind);
+    int num=0;//该类设备的数量
+    int sum=0;//该类设备价格总和
+    int max=0;//该类设备价格的最大值
+    int min=100000;//该类设备价格的最小值
+    float ave=0;//该类设备的平均价格
+    int scrapnum=0;//该类设备报废数量
+    for (i=0;i<n;i++) {
+        if (strcmp(equ[i].kind,kind)==0) {
+            num++;
+            sum+=equ[i].price;
+            if (equ[i].scrap==0) {
+                scrapnum++;
+            }
+            if (equ[i].price>max) {
+                max=equ[i].price;
+            }
+            if (equ[i].price<min) {
+                min=equ[i].price;
+            }
+        }
+    }
+    fclose(fp);
+    if (num > 0) {
+        ave=(float)(sum)/num;
+        printf("该类设备数量：%d \n该类设备平均价格：%5.2f \n该类设备报废数量：%d \n该类设备价格的最大值：%d \n该类设备价格的最小值：%d \n",num,ave,scrapnum,max,min);
+    }
+    else {
+        printf("实验室不存在该种类的实验设备！\n");
+    }
+    choosemenu();
+}
+
+//实验设备查询模块
+void check() {
+    FILE *fp = nullptr;
+    int b,i;//记录查询的实验设备编号
+    void choosemenu(void);//声明调用函数
+    int n=readfile(fp);
+    printf("请输入你想查询实验设备的编号:");
+    scanf("%d",&b);
+    for (i=0;i<n;i++) {
+        if (equ[i].num==b) {
+            printf("设备编号:");
+            printf("%d\n",equ[i].num);
+            printf("设备种类:");
+            printf("%s\n",equ[i].kind);
+            printf("设备名称:");
+            printf("%s\n",equ[i].name);
+            printf("设备价格:");
+            printf("%d\n",equ[i].price);
+            printf("设备购入日期:");
+            printf("%s\n",equ[i].buydate);
+            printf("设备是否报废:");
+            if (equ[i].scrap==0) {
+                printf("是\n");
+            }
+            else printf("否\n");
+            printf("设备报废日期:");
+            printf("%s\n",equ[i].scrapdate);
+            choosemenu();
+            break;
+        }
+    }
+    printf("不存在该编号的设备！\n");
+    choosemenu();
+}
+
+//管理员注册函数
+void sign_up() {
+    FILE *fp1 = nullptr;
+    FILE *fp2 = nullptr;
+    int i=0;
+    int n=0;
+    if ((fp1=fopen("/Users/john/Desktop/manager.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    while (!feof(fp1)) {
+        fscanf(fp1, "%s %d %s",manager[i].phone,&manager[i].num,manager[i].password);
+        i++;
+    }
+    fclose(fp1);
+    n = i;
+    printf("请输入注册管理员相关信息:电话 编号 密码：\n");
+    scanf("%s %d %s",manager[i].phone,&manager[i].num,manager[i].password);
+    if ((fp2=fopen("/Users/john/Desktop/manager.txt","w"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    for (i=0;i<n+1;i++) {
+        fprintf(fp2, "%s %d %s\n",manager[i].phone,manager[i].num,manager[i].password);
+    }
+    fclose(fp2);
+    printf("您已成功注册并且登陆!\n");
+}
+
+int readmanager(FILE *fp) {
+    int i = 0;
+    if ((fp=fopen("/Users/john/Desktop/manager.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    while (!feof(fp)) {
+        fscanf(fp, "%s %d %s",manager[i].phone,&manager[i].num,manager[i].password);
+        i++;
+    }
+    fclose(fp);
+    return i;
+}
+//管理员登陆函数
+int log_in() {
+    FILE *fp = nullptr;
+    char phone[20];
+    char password[20];
+    int n = readmanager(fp);
+    printf("请输入你的手机号码:");
+    scanf("%s",phone);
+    printf("请输入你的密码:");
+    scanf("%s",password);
+    for (int i=0;i<n;i++) {
+        if (strcmp(password,manager[i].password)==0 && strcmp(manager[i].phone,phone)==0) {
+            printf("欢迎进入实验室设备管理系统!\n");
+            return 1;
+        }
+    }
+    return 0;
+}
+
+//管理员删除程序
+void delete_manager() {
+    FILE *fp1 = nullptr;
+    FILE *fp2 = nullptr;
+    int i=0,a,n,m;//n用来计数，a用来判断是否想要注销
+    int j=0;
+    printf("是否想要注销该管理员账号，若要注销，输入1，否则，输入0:");
+    scanf("%d",&a);
+    if (a==1) {
+        printf("请输入自己的编号：");
+        scanf("%d",&m);
+        n=readmanager(fp1);
+        for (i=0;i<n-1;i++) {
+            if(j==1) {
+                manager[i] = manager[i+1];
+            }
+            if (manager[i].num==m) {
+                j=1;
+                manager[i] = manager[i+1];
+            }
+        }
+        if ((fp2=fopen("/Users/john/Desktop/manager.txt","w"))==NULL) {
+            printf("无法打开此文件!\n");
+        }
+        for (i=0;i<n-1;i++) {
+            fprintf(fp2, "%s %d %s\n",manager[i].phone,manager[i].num,manager[i].password);
+        }
+        fclose(fp2);
+    }
+    if(j==1) {
+        printf("已经成功注销并且删除账户！\n");
+    }
+    else {
+        printf("该账户仍然正常运行。\n");
+    }
+}
+
+void choosemenu() {
+    int j;
+    int n,w;//n用来选择菜单，w判断n是否在菜单对应的范围内
+    printf("是否要退出系统，若想要退出系统，则输入1，否则输入0:");;
+    scanf("%d",&j);
+    if (j==0) {
+        do {
+            puts("\t\t*****************MENU****************\n\n");
+            puts("\t\t\t\t 1.录入设备");
+            puts("\t\t\t\t 2.修改设备");
+            puts("\t\t\t\t 3.分类统计");
+            puts("\t\t\t\t 4.设备的查询");
+            puts("\t\t\t\t 5.设备删除");
+            puts("\t\t\t\t 6.退出管理系统");
+            puts("\n\n\t\t ************************************\n");
+            printf("choice your number(1-6): \b\b");
+            scanf("%d",&n);
+            if (n<1||n>6) {
+                w=1;
+                getchar();//要求用户重新输入数字
+            }
+            else w=0;
+        }while (w==1);
+        //选择功能
+        switch (n) {
+            case 1:add();break;
+            case 2:modify();break;
+            case 3:sta();break;
+            case 4:check();break;
+            case 5:del();break;
+            case 6:
+                delete_manager();
+                exit(0);
+        }
+    }
+    else exit(0);
+}
+
+int main(int argc, const char * argv[]) {
+    int n,w,q,p;//n用来选择菜单，w判断n是否在菜单对应的范围内,q用来判断是否拥有账号,p用于是否注册
+    printf("是否为新管理员，如果是新管理员，输入0，如果为老管理员，则输入1:");
+    scanf("%d",&q);
+    if (q==1) {
+        if(log_in()) {
+            do {
+                puts("\t\t*****************MENU****************\n\n");
+                puts("\t\t\t\t 1.录入设备");
+                puts("\t\t\t\t 2.修改设备");
+                puts("\t\t\t\t 3.分类统计");
+                puts("\t\t\t\t 4.设备的查询");
+                puts("\t\t\t\t 5.设备删除");
+                puts("\t\t\t\t 6.退出管理系统");
+                puts("\n\n\t\t ************************************\n");
+                printf("choice your number(1-6): \b\b");
+                scanf("%d",&n);
+                if (n<1||n>6) {
+                    w=1;
+                    printf("请重新输入数字:");
+                    getchar();//要求用户重新输入数字
+                }
+                else w=0;
+            }while (w==1);
+            //选择功能
+            switch (n) {
+                case 1:add();break;
+                case 2:modify();break;
+                case 3:sta();break;
+                case 4:check();break;
+                case 5:del();break;
+                case 6:
+                    delete_manager();
+                    exit(0);
+            }
+        }
+        else {
+            printf("你没有权限访问设备！\n");
+        }
+    }
+    else {
+        printf("是否想要注册账号,若想要注册账号，输入1，否则，则输入0:");
+        scanf("%d",&p);
+        if (p==1) {
+            sign_up();
+            choosemenu();
+        }
+    }
+    return 0;
+}
+
