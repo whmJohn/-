@@ -71,14 +71,13 @@ int main(int argc, char *argv[])
             puts("\t\t*****************MENU****************\n\n");
             puts("\t\t\t\t 1.初始化队列");
             puts("\t\t\t\t 2.用已有的队列q来初始化队列");
-            puts("\t\t\t\t 3.返回栈队列内容量");
-            puts("\t\t\t\t 4.返回队列内的元素个数");
-            puts("\t\t\t\t 5.取下标x处的队列元素");
-            puts("\t\t\t\t 6.元素入队列");
-            puts("\t\t\t\t 7.元素出队列");
-            puts("\t\t\t\t 8.将已有的队列赋给p所指的队列");
-            puts("\t\t\t\t 9.打印队列内元素");
-            puts("\t\t\t\t 10.销毁队列并且退出");
+            puts("\t\t\t\t 3.返回队列内的元素个数");
+            puts("\t\t\t\t 4.取下标x处的队列元素");
+            puts("\t\t\t\t 5.元素入队列");
+            puts("\t\t\t\t 6.元素出队列");
+            puts("\t\t\t\t 7.将已有的队列赋给p所指的队列");
+            puts("\t\t\t\t 8.打印队列内元素");
+            puts("\t\t\t\t 9.销毁队列并且退出");
             puts("\n\n\t\t ************************************\n");
             printf("choice your number(1-10): \b\b");
             scanf("%d",&n);
@@ -100,14 +99,9 @@ int main(int argc, char *argv[])
                     printf("初始化的队列的元素个数为%d\n",p->operator int());
                     break;
                 case 3:
-                    if (p) {
-                        printf("队列的容量为%d\n",p->size());
-                    }
-                    break;
-                case 4:
                     printf("队列目前有%d个元素。\n",p->operator int());
                     break;
-                case 5:
+                case 4:
                     do {
                         printf("你想要查找队列的元素的位置为？\n");
                         scanf("%d",&x);
@@ -117,7 +111,7 @@ int main(int argc, char *argv[])
                     }while((*p)[x]==-1);
                     printf("该位置的队列内元素为%d\n",(*p)[x]);
                     break;
-                case 6:
+                case 5:
                     printf("你想要入队列的元素为？\n");
                     scanf("%d",&e);
                     if (!p||p->operator int() >= p->size()) {
@@ -127,7 +121,7 @@ int main(int argc, char *argv[])
                         printf("入队列成功！\n");
                     *p<<e;
                     break;
-                case 7:
+                case 6:
                     if (!p || p->operator int()<=0) {
                         printf("元素出队列失败！\n");
                     }
@@ -137,14 +131,14 @@ int main(int argc, char *argv[])
                         printf("出队列的元素为%d\n",e);
                     }
                     break;
-                case 8:
+                case 7:
                     *p = *q;
                     printf("、队列赋值成功！\n");
                     break;
-                case 9:
+                case 8:
                     p->print();
                     break;
-                case 10:
+                case 9:
                     p->~QUEUE();
                     printf("队列销毁成功！\n");
                     exit(0);
