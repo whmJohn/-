@@ -1,0 +1,62 @@
+//
+//  main.cpp
+//  Floyd-Warshall
+//
+//  Created by whm内芽 on 2019/4/26.
+//  Copyright © 2019 whm内芽. All rights reserved.
+//
+
+#include <iostream>
+
+using namespace std;
+const int MAX = 100000;
+
+int n=5,path[6][6],dist[6][6],map[6][6];
+void init() {
+    int i,j;
+        for(i=1;i<=n;i++)
+            for(j=1;j<=n;j++)
+                map[i][j]=(i==j)?0:MAX;
+    map[1][2] = 3, map[1][3] = 8, map[1][5] = -4;
+    map[2][4] = 1, map[2][5] = 7;
+    map[3][2] = 4;
+    map[4][1] = 2, map[4][3] = -5;
+    map[5][4] = 6;
+}
+
+void floyd(){
+    int i,j,k;
+    for(i=1;i<=n;i++)
+        for(j=1;j<=n;j++)
+            dist[i][j]=map[i][j],path[i][j]=0;
+        for(k=1;k<=n;k++)
+            for(i=1;i<=n;i++)
+                for(j=1;j<=n;j++)
+                    if(dist[i][k]+dist[k][j]<dist[i][j])
+                        dist[i][j]=dist[i][k]+dist[k][j],path[i][j]=k;
+}
+
+void output(int i,int j) {
+    if(i==j) return;
+    if(path[i][j]==0)
+        cout<<'-'<<j;
+    else {
+        output(i,path[i][j]);
+        output(path[i][j],j);
+    }
+}
+
+int main() {
+    int u,v;
+    init();
+    floyd();
+    while(static_cast<void>(cin>>u>>v),u||v){
+        if(dist[u][v]==MAX) cout<<"No path"<<endl;
+            else {
+                cout<<u;
+                output(u,v);
+                cout<<endl;
+            }
+        }
+    return 0;
+}
