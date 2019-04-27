@@ -1,0 +1,91 @@
+//
+//  main.cpp
+//  Floyd-Warshall
+//
+//  Created by whm内芽 on 2019/4/26.
+//  Copyright © 2019 whm内芽. All rights reserved.
+//
+
+#include <iostream>
+
+using namespace std;
+const int MAX = 9999;
+
+int n,path[6][6],dist[6][6],map[6][6];
+void init() {
+    FILE *fp;
+    int edgenum;
+    int m,b;
+    if ((fp=fopen("/Users/john/Desktop/fw.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    fscanf(fp, "%d",&edgenum);
+    int i,j;
+    for (i=1;i<=edgenum;i++) {
+        fscanf(fp, "%d %d",&m,&b);
+        if(m>b) {
+            n = m;
+        }
+        else {
+            n = b;
+        }
+        fscanf(fp,"%d",&map[m][b]);
+    }
+    for(i=1;i<=n;i++)
+        for(j=1;j<=n;j++) {
+            if(i==j) {
+                map[i][j]=0;
+            }
+            else if(map[i][j] == 0)
+                map[i][j] = MAX;
+        }
+    fclose(fp);
+}
+
+void floyd(){
+    int i,j,k;
+    for(i=1;i<=n;i++)
+        for(j=1;j<=n;j++)
+            dist[i][j]=map[i][j],path[i][j]=0;
+        for(k=1;k<=n;k++)
+            for(i=1;i<=n;i++)
+                for(j=1;j<=n;j++)
+                    if(dist[i][k]+dist[k][j]<dist[i][j])
+                        dist[i][j]=dist[i][k]+dist[k][j],path[i][j]=k;
+}
+
+void output(int i,int j) {
+    if(i==j) return;
+    if(path[i][j]==0)
+        cout<<'-'<<j;
+    else {
+        output(i,path[i][j]);
+        output(path[i][j],j);
+    }
+}
+
+int main() {
+    int u,v;
+    init();
+    floyd();
+    for (u=1; u<=n; u++) {
+        for(v=1; v<=n; v++) {
+            if (u == v) {
+                continue;
+            }
+            if(dist[u][v]==MAX) cout<<"No path"<<endl;
+            else {
+                cout<<u;
+                output(u,v);
+                cout<<" "<<dist[u][v];
+                cout<<endl;
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+
+
