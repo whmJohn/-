@@ -1,0 +1,137 @@
+//
+//  main.cpp
+//  Bellman-Ford
+//
+//  Created by whm内芽 on 2019/4/26.
+//  Copyright © 2019 whm内芽. All rights reserved.
+//
+
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+
+using namespace std;
+
+#define MAX 999
+#define N 99 //边的最大数量
+int nodenum, edgenum,original; //点数量，边数量，源点
+string node[10];
+
+//边的结构体定义
+typedef struct Edge {
+    int u, v;
+    char end[10],start[10];
+    int cost;
+}Edge;
+
+Edge edge[N];
+int dis[N], pre[N],after[N];//距离,前驱数组和后置数组
+
+//松弛函数
+void Relax(int Start,int End,int Weight) {
+    if(dis[End]>dis[Start]+Weight) {
+        dis[End]=dis[Start]+Weight;
+        pre[End] = Start;
+        after[Start] = End;
+    }
+}
+
+bool Bellman_Ford() {
+    for(int i = 1; i <= nodenum; ++i) //对距离的初始化
+        dis[i] = (i == original ? 0 : MAX);
+    for(int i = 1; i <= nodenum - 1; ++i) {
+        for(int j = 1; j <= edgenum; ++j) {
+            Relax(edge[j].u,edge[j].v,edge[j].cost);
+        }
+    }
+    bool flag = 1; //判断是否含有负权回路
+    for(int i = 1; i <= edgenum; ++i)
+        if(dis[edge[i].v] > dis[edge[i].u] + edge[i].cost) {
+            flag = 0;
+            break;
+        }
+    return flag;
+}
+
+//打印最短路的路径（反向）
+void print_path(int root) {
+    int o=0;
+    while(root != after[o]) {
+        printf("%s-", node[o].c_str());
+        o = after[o];
+    }
+    printf("%s-", node[o].c_str());
+    o = after[o];
+    printf("%s ", node[o].c_str());
+}
+
+int main() {
+    char la[10];
+    FILE *fp;
+    int i = 0;
+    int j = 0;
+    int m = 2;
+    int q = 0;
+    int p = 0;
+    if ((fp=fopen("/Users/john/Desktop/bf.txt","r"))==NULL) {
+        printf("无法打开此文件!\n");
+    }
+    fscanf(fp,"%d %s",&edgenum,la);
+    for(i = 1; i <= edgenum; ++i) {
+        fscanf(fp,"%s %s %d", edge[i].start, edge[i].end, &edge[i].cost);
+    }
+    edge[1].u = 0;
+    node[0] = edge[1].start;
+    edge[1].v = 1;
+    node[1] = edge[1].end;
+    for(i = 2; i <= edgenum; ++i) {
+        q = 0;
+        p = 0;
+        for(j = 1;j < i; ++j) {
+            if(edge[i].start[0] == edge[j].start[0]) {
+                edge[i].u = edge[j].u;
+                q = 1;
+                continue;
+            }
+            else if(edge[i].start[0] == edge[j].end[0]) {
+                edge[i].u = edge[j].v;
+                q = 1;
+                continue;
+            }
+            if(edge[i].end[0] == edge[j].start[0]) {
+                edge[i].v= edge[j].u;
+                p = 1;
+                continue;
+            }
+            else if(edge[i].end[0] == edge[j].end[0]) {
+                edge[i].v = edge[j].v;
+                p = 1;
+                continue;
+            }
+        }
+        if (q == 0) {
+            edge[i].u = m++;
+            node[m-1] = edge[i].start;
+        }
+        if (p == 0) {
+            edge[i].v = m++;
+            node[m-1] = edge[i].end;
+        }
+    }
+    nodenum = ++m;
+    fclose(fp);
+    nodenum = 5;
+    printf("20161004018 王浩铭\n");
+    pre[original] = original;
+    if(Bellman_Ford())
+        for(i = 1; i <= nodenum-1; ++i) { //每个点最短路
+            print_path(i);
+            printf("%d\n", dis[i]);
+        }
+    else
+        printf("have a negative circle!\n");
+    return 0;
+}
+
+
+
