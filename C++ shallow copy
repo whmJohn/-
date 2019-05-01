@@ -1,0 +1,40 @@
+#include <iostream>
+using namespace std;
+
+class A {
+    int  *p, size;
+public:
+    int  get(int x) {
+        return p[x];
+    };
+    A (int s);
+    ~A ( ) {
+        if(p) {
+            delete p;
+            p=0;
+        }
+        cout<<"Destruct A("<< size <<")\n";
+    }
+};
+
+A::A (int s) {
+    p=new int[size=s];
+    for(int i=0; i<s; i++)
+        p[i]=1;
+    cout<<"Construct A ("<<s<<")\n";
+}
+
+//调用时将浅拷贝构造y
+void f(A y) {
+    cout<<"f:";
+}//返回析构y
+
+int main(void) {
+    A a(6);
+    cout<<"main: a[0]="<<a.get(0)<<"\n";
+    f (a); //a浅拷贝赋值给y: y.p=a.p
+    int *q=new int[6];  q[0]=8;
+    cout<<"main: a[0]="<<a.get(0);
+    cout<<endl;
+    return 0;
+}
