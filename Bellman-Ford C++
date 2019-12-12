@@ -11,6 +11,7 @@
 
 using namespace std;
 
+#修改后
 #define MAX 999
 #define N 99 //边的最大数量
 int nodenum, edgenum, original; //点数量，边数量，源点
