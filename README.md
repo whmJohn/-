@@ -1,1 +1,1 @@
-# Hust Computer Science Task
+# Hust Computer Science Course Task
